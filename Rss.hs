@@ -4,6 +4,8 @@ import Data.Maybe
 import Text.Feed.Import
 import Text.Feed.Query
 import Text.Feed.Types
+import Text.Regex
+import Data.Char
 
 tryParse::IO Feed
 tryParse  =
@@ -19,7 +21,22 @@ showItems feed = case feed of
   Just f ->  do
   --parsed<-tryParse
   let items=feedItems  f
-  let titles=map getItemTitle items
+  let filteredItems=filterSales items
+  let titles=map getItemTitle filteredItems
   let t=map ( fromJust ) titles
   mapM (putStrLn) t
   --putStrLn ""
+
+-- строки с совпадениями будут исключены
+regexString="телефон|ремонт"::String
+
+filterTitle::String->Bool
+filterTitle t= case found of
+  Just x -> False
+  otherwise -> True
+  where found = matchRegex ( mkRegex regexString) t
+
+filterSales::[Item] -> [Item]
+filterSales items =
+  filter (filterTitle . fromJust . getItemTitle) itemsWithTitle
+  where itemsWithTitle= filter (isJust . getItemTitle) items
