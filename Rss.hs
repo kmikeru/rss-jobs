@@ -22,8 +22,9 @@ showItems feed = case feed of
   --parsed<-tryParse
   let items=feedItems  f
   let filteredItems=filterSales items
-  let titles=map getItemTitle filteredItems
-  let t=map ( fromJust ) titles
+  --let titles=map getItemTitle filteredItems
+  let outstr = map (getItemId) items
+  let t=map ( snd . fromJust ) outstr
   mapM (putStrLn) t
   --putStrLn ""
 
@@ -40,3 +41,6 @@ filterSales::[Item] -> [Item]
 filterSales items =
   filter (filterTitle . fromJust . getItemTitle) itemsWithTitle
   where itemsWithTitle= filter (isJust . getItemTitle) items
+
+instance Eq Item where
+      (==) a b = getItemId a == getItemId b
