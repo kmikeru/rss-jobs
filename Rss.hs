@@ -4,8 +4,9 @@ import Data.Maybe
 import Text.Feed.Import
 import Text.Feed.Query
 import Text.Feed.Types
-import Text.Regex
-import Data.Char
+import Data.List
+--import Text.Regex
+--import Data.Char
 
 tryParse::IO Feed
 tryParse  =
@@ -15,32 +16,27 @@ parseFeed::String -> Maybe Feed
 parseFeed inp =
   parseFeedString inp
 
-showItems::Maybe Feed -> IO [()]
-showItems feed = case feed of
-  Nothing -> mapM (putStrLn) ["none"]
+showItem::Item -> IO ()
+showItem item = case title of
+  Nothing -> putStrLn "none"
+  Just f -> putStrLn (f++" "++itemid)
+  where  title = getItemTitle item
+         itemid = snd $ fromJust (getItemId item)
+
+showItems::[Item] -> IO ()
+showItems items =
+  mapM_ showItem items
+
+showFeed::Maybe Feed -> IO ()
+showFeed feed = case feed of
+  Nothing -> putStr ""
   Just f ->  do
-  --parsed<-tryParse
   let items=feedItems  f
-  let filteredItems=filterSales items
-  --let titles=map getItemTitle filteredItems
-  let outstr = map (getItemId) items
-  let t=map ( snd . fromJust ) outstr
-  mapM (putStrLn) t
-  --putStrLn ""
+  showItems items
 
--- строки с совпадениями будут исключены
-regexString="телефон|ремонт"::String
-
-filterTitle::String->Bool
-filterTitle t= case found of
-  Just x -> False
-  otherwise -> True
-  where found = matchRegex ( mkRegex regexString) t
-
-filterSales::[Item] -> [Item]
-filterSales items =
-  filter (filterTitle . fromJust . getItemTitle) itemsWithTitle
-  where itemsWithTitle= filter (isJust . getItemTitle) items
+mergeFeedItems::[Maybe Feed] ->[Item]
+mergeFeedItems feeds =
+  nub $ concat (map (feedItems . fromJust ) feeds)
 
 instance Eq Item where
-      (==) a b = getItemId a == getItemId b
+        (==) a b = getItemId a == getItemId b

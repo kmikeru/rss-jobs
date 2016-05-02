@@ -1,20 +1,21 @@
 {-# LANGUAGE OverloadedStrings  #-}
-import Data.List
-import Data.Configurator
-import Data.Configurator.Types (Value)
+--import Data.List
 import Download
 import Rss
+import Filter
+import Data.Configurator
 
 main :: IO ()
 main = do
   putStrLn "hello"
   cfg <- load [Required "rss-job.cfg"]
-  --lst <- require cfg "urllist" :: IO Value
-  lst <- require cfg "urllist" :: IO [String]
-  print lst
+  urls <- require cfg "urllist" :: IO [String]
+  filterRegex <- require cfg "filterRegex" :: IO String
+  print filterRegex
+  l<- download urls
+  let feeds = map parseFeed l
+  let mergedItems = mergeFeedItems feeds
+  let filtered = filterItems mergedItems filterRegex
+  showItems filtered
 
-  l<- mapM downloadURL lst
-  let f = map parseFeed l
-  mapM_ showItems f
-    
   putStrLn "end"
