@@ -4,6 +4,8 @@ import Download
 import Rss
 import Filter
 import Data.Configurator
+import Text.Feed.Export
+import qualified Text.XML.Light.Output as XML
 
 main :: IO ()
 main = do
@@ -17,5 +19,8 @@ main = do
   let mergedItems = mergeFeedItems feeds
   let filtered = filterItems mergedItems filterRegex
   showItems filtered
-
+  let newfeed=exportFeed filtered
+  --putStrLn $ show newfeed
+  let e=xmlFeed newfeed
+  putStrLn $ XML.ppElement e
   putStrLn "end"

@@ -4,6 +4,7 @@ import Data.Maybe
 import Text.Feed.Import
 import Text.Feed.Query
 import Text.Feed.Types
+import Text.Feed.Constructor
 import Data.List
 --import Text.Regex
 --import Data.Char
@@ -40,3 +41,9 @@ mergeFeedItems feeds =
 
 instance Eq Item where
         (==) a b = getItemId a == getItemId b
+
+--exportFeed::[Item]->Feed
+exportFeed items=
+  --map (\x -> addItem x f) items
+  foldl (\acc item ->addItem item acc ) f items
+  where f=newFeed $ RSSKind (Just "2.0")
