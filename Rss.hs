@@ -32,8 +32,7 @@ showFeed::Maybe Feed -> IO ()
 showFeed feed = case feed of
   Nothing -> putStr ""
   Just f ->  do
-  let items=feedItems  f
-  showItems items
+    showItems $ feedItems  f   
 
 mergeFeedItems::[Maybe Feed] ->[Item]
 mergeFeedItems feeds =
